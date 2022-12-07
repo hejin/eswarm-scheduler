@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/hejin/eswarm-scheduler/pkg/register"
 	"k8s.io/component-base/logs"
 	"math/rand"
 	"os"
