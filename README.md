@@ -1,4 +1,4 @@
-            how to demonstrate the sample scheduler
+            how to run the simplest k8s scheduler plugin
 
 0. prepare the environment
   - x86-64 ubuntu 22.04 LTS jammy
