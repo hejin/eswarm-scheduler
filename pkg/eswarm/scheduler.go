@@ -3,18 +3,15 @@ package eswarm
 import (
 	"context"
 	"errors"
-	//"fmt"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"sigs.k8s.io/controller-runtime/pkg/scheme"
-	//"k8s.io/apimachinery/pkg/types"
-	//scv "github.com/NJUPT-ISL/SCV/api/v1"
 	"k8s.io/klog"
 	"k8s.io/kubernetes/pkg/scheduler/framework"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/scheme"
 )
 
 const (
@@ -46,7 +43,6 @@ func New(_ runtime.Object, handle framework.Handle) (framework.Plugin, error) {
 	mgrConfig.QPS = 1000
 	mgrConfig.Burst = 1000
 
-	//if err := scv.AddToScheme(schemeLocal); err != nil {
 	if err := AddToScheme(schemeLocal); err != nil {
 		klog.Error(err)
 		return nil, err
@@ -68,12 +64,12 @@ func New(_ runtime.Object, handle framework.Handle) (framework.Plugin, error) {
 			panic(err)
 		}
 	}()
-	scvCache := mgr.GetCache()
+	Cache := mgr.GetCache()
 
-	if scvCache.WaitForCacheSync(context.TODO()) {
+	if Cache.WaitForCacheSync(context.TODO()) {
 		return &eSwarm{
 			handle: handle,
-			cache:  scvCache,
+			cache:  Cache,
 		}, nil
 	} else {
 		return nil, errors.New("Cache Not Sync! ")
