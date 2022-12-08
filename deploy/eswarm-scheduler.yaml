@@ -1,0 +1,239 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scheduler-config2
+  namespace: kube-system
+data:
+  scheduler-config.yaml: |
+    apiVersion: kubescheduler.config.k8s.io/v1beta2
+    kind: KubeSchedulerConfiguration
+    leaderElection:
+      leaderElect: true
+      leaseDuration: 15s
+      renewDeadline: 10s
+      resourceLock: leases
+      resourceName: eswarm-scheduler
+      resourceNamespace: kube-system
+      retryPeriod: 2s
+    percentageOfNodesToScore: 0
+    podInitialBackoffSeconds: 1
+    podMaxBackoffSeconds: 10
+    profiles:
+      - plugins:
+          filter:
+            enabled:
+              - name: eswarm
+          preBind:
+            enabled:
+              - name: eswarm
+        schedulerName: eswarm-scheduler
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eswarm-scheduler2
+  namespace: kube-system
+  labels:
+    component: eswarm-scheduler2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: eswarm-scheduler2
+  template:
+    metadata:
+      labels:
+        component: eswarm-scheduler2
+    spec:
+      imagePullSecrets:
+      - name: registry-aliyun
+      serviceAccount: eswarm-sa
+      priorityClassName: system-cluster-critical
+      volumes:
+        - name: scheduler-config
+          configMap:
+            name: scheduler-config2
+      containers:
+        - name: eswarm-scheduler
+          image: registry.cn-hangzhou.aliyuncs.com/oprobot/eswarm-scheduler:0.0.1
+          imagePullPolicy: Always
+          args:
+            - eswarm-scheduler
+            - --config=/scheduler/scheduler-config.yaml
+            - --v=4
+          resources:
+            requests:
+              cpu: "300m"
+          volumeMounts:
+            - name: scheduler-config
+              mountPath: /scheduler
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: eswarm-cr
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+      - events
+    verbs:
+      - create
+      - get
+      - update
+  - apiGroups:
+      - ""
+    resourceNames:
+      - eswarm-scheduler
+    resources:
+      - endpoints
+    verbs:
+      - delete
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - delete
+      - get
+      - list
+      - watch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - bindings
+      - pods/binding
+    verbs:
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - pods/status
+    verbs:
+      - patch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - replicationcontrollers
+      - services
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apps
+      - extensions
+    resources:
+      - replicasets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - statefulsets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - policy
+    resources:
+      - poddisruptionbudgets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumeclaims
+      - persistentvolumes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - "storage.k8s.io"
+    resources:
+      - storageclasses
+      - csinodes
+      - csidrivers
+      - csistoragecapacities
+    verbs:
+      - watch
+      - list
+      - get
+  - apiGroups:
+      - "coordination.k8s.io"
+    resources:
+      - leases
+    verbs:
+      - create
+      - get
+      - list
+      - update
+  - apiGroups:
+      - "events.k8s.io"
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+      - update
+  - apiGroups:
+      - "core.run-linux.com"
+    resources:
+      - scvs
+    verbs:
+      - delete
+      - get
+      - list
+      - watch
+      - update
+      - patch
+      - create
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: eswarm-sa
+  namespace: kube-system
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: eswarm-crb
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: eswarm-cr
+subjects:
+  - kind: ServiceAccount
+    name: eswarm-sa
+    namespace: kube-system
