@@ -45,6 +45,8 @@ spec:
       labels:
         component: eswarm-scheduler2
     spec:
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: '' 
       imagePullSecrets:
       - name: registry-aliyun
       serviceAccount: eswarm-sa
