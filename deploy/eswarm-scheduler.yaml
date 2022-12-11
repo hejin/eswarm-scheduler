@@ -20,10 +20,7 @@ data:
     podMaxBackoffSeconds: 10
     profiles:
       - plugins:
-          filter:
-            enabled:
-              - name: eswarm
-          preBind:
+          score:
             enabled:
               - name: eswarm
         schedulerName: eswarm-scheduler

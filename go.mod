@@ -3,21 +3,13 @@ module eswarm-scheduler
 go 1.15
 
 require (
-	github.com/google/go-cmp v0.5.5
-	github.com/spf13/cobra v1.2.1
 	k8s.io/api v0.23.10
 	k8s.io/apimachinery v0.23.10
-	k8s.io/client-go v0.23.10
-	k8s.io/code-generator v0.23.10
+	k8s.io/apiserver v0.23.10
 	k8s.io/component-base v0.23.10
-	k8s.io/klog v1.0.0
-	k8s.io/klog/hack/tools v0.0.0-20210917071902-331d2323a192
-	k8s.io/kube-scheduler v0.23.10
+	k8s.io/klog/v2 v2.30.0
 	k8s.io/kubernetes v1.23.10
-	k8s.io/utils v0.0.0-20211116205334-6203023598ed
-	sigs.k8s.io/controller-runtime v0.11.1
 	sigs.k8s.io/scheduler-plugins v0.23.10
-	sigs.k8s.io/yaml v1.3.0
 )
 
 replace (
