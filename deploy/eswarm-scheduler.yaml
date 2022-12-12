@@ -44,8 +44,8 @@ spec:
     spec:
       nodeSelector:
         node-role.kubernetes.io/control-plane: '' 
-      imagePullSecrets:
-      - name: registry-aliyun
+          #imagePullSecrets:
+          #- name: registry-aliyun
       serviceAccount: eswarm-sa
       priorityClassName: system-cluster-critical
       volumes:
@@ -54,7 +54,8 @@ spec:
             name: scheduler-config2
       containers:
         - name: eswarm-scheduler
-          image: registry.cn-hangzhou.aliyuncs.com/oprobot/eswarm-scheduler:0.0.1
+#         image: registry.cn-hangzhou.aliyuncs.com/oprobot/eswarm-scheduler:0.0.1
+          image: o5jeff/eswarm-scheduler:0.0.3
           imagePullPolicy: Always
           args:
             - eswarm-scheduler
