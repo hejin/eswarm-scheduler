@@ -1,23 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: busybox
+  name: nginx-deployment
+  labels:
+    app: nginx
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      app: busybox
+      app: nginx
   template:
     metadata:
       labels:
-        app: busybox
+        app: nginx
     spec:
       schedulerName: eswarm-scheduler
       terminationGracePeriodSeconds: 5
       nodeSelector:
         node-role.kubernetes.io/worker: worker
       containers:
-      - image: busybox:latest
+      - name: nginx
+        image: nginx:1.14.2
         imagePullPolicy: IfNotPresent
-        name: busybox
-        command: ["sleep", "3600"]
+        ports:
+        - containerPort: 80

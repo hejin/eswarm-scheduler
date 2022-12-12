@@ -27,6 +27,7 @@ import (
 	"k8s.io/kubernetes/pkg/features"
 	"k8s.io/kubernetes/pkg/scheduler/framework"
 	schedutil "k8s.io/kubernetes/pkg/scheduler/util"
+	"strings"
 )
 
 // resourceToWeightMap contains resource name and weight.
@@ -53,14 +54,12 @@ func (r *resourceAllocationScorer) getNodeCpuPerfLabel(
 	nodeInfo *framework.NodeInfo) (string, bool) {
 	node := nodeInfo.Node()
 	// FIXME: make sure node available
-	labels := node.Labels
+	arch_str := node.Status.NodeInfo.Architecture
 
-	nodeCpuPerfRatioFlag, ok := labels["emulate-arm"]
-	if ok {
-		return nodeCpuPerfRatioFlag, true
-	} else {
-		return "", false
+	if 0 == strings.Compare(arch_str, "arm64") {
+		return "Y", true
 	}
+	return "", false
 }
 
 // score will use `scorer` function to calculate the score.
